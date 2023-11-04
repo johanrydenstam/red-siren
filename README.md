@@ -6,13 +6,20 @@
 3. Run the following command in the root of the project to start the tailwind CSS compiler:
 
 ```bash
-npx tailwindcss -i ./input.css -o ./public/tailwind.css --watch
+npx tailwindcss -c ./red-siren-lib/tailwind.config.js -i ./red-siren-lib/input.css -o ./public/tailwind.css --watch
 ```
 
 Run the following command in the root of the project to start the Dioxus dev server:
 
 ```bash
-dx serve --hot-reload
+cd red-siren-web
+dx build --features web
+dx serve --features ssr --hot-reload --platform desktop
+```
+
+```bash
+cargo watch -s "dx build --features web 
+dx serve --features ssr --platform desktop --bin red-siren-web"
 ```
 
 - Open the browser to http://localhost:8080

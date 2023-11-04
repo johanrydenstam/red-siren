@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#main {
+  width: 100vw;
+  height: 100vh;
+}
+
+.splash {
+  position: relative;
+}
+
+.splash-drawing {
+  display: contents;
+}
+
+.splash-drawing svg {
+  position: absolute;
+  height: 100%;
+  width: auto;
+  top:0;
+  left: 0;
+}
+
+.splash-drawing svg#siren, .splash-drawing svg#siren-front, .splash-drawing svg#flute {
+  right: 0;
+  bottom: 0;
+  left: auto;
+  top: auto;
+}
