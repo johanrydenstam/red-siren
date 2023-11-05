@@ -1,5 +1,5 @@
 use crux_core::typegen::TypeGen;
-use shared::Counter;
+use shared::CatFacts;
 use std::path::PathBuf;
 
 fn main() {
@@ -7,7 +7,7 @@ fn main() {
 
     let mut gen = TypeGen::new();
 
-    gen.register_app::<Counter>().expect("register");
+    gen.register_app::<CatFacts>().expect("register");
 
     let output_root = PathBuf::from("./generated");
 
@@ -15,7 +15,7 @@ fn main() {
         .expect("swift type gen failed");
 
     gen.java(
-        "com.example.simple_counter.shared_types",
+        "com.redbadger.catfacts.shared_types",
         output_root.join("java"),
     )
     .expect("java type gen failed");

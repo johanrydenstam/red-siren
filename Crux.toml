@@ -13,17 +13,8 @@ template = "Android"
 source = "Android"
 cores = ["shared"]
 
-[shells.iOS]
-template = "iOS"
-source = "iOS"
-cores = ["shared"]
-
 [shells.web_leptos]
 template = "web-leptos"
 source = "web-leptos"
 cores = ["shared"]
 
-[shells.web_yew]
-template = "web-yew"
-source = "web-yew"
-cores = ["shared"]
