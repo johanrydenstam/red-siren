@@ -4,25 +4,23 @@ version = "0.1.0"
 authors = ["a.nvlkv <a.nvlkv@protonmail.ch>"]
 edition = "2021"
 
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
-dioxus-web = { version = "0.4" }
-dioxus = { version = "0.4" }
-red-siren-lib = { path = "../red-siren-lib", features = []}
-
-# Debug
-log = "0.4.19"
+dioxus = { workspace = true }
+dioxus-web = { workspace = true }
+dioxus-fullstack = { workspace = true }
+dioxus-ssr = { workspace = true, optional = true}
+log = { workspace = true }
+red-siren-lib = { path = "../red-siren-lib", features = [] }
+tokio = { version = "1.33.0" }
+axum = { version = "0.6.20", optional = true }
 dioxus-logger = "0.4.1"
 console_error_panic_hook = "0.1.7"
-
-# fullstack
-dioxus-fullstack = "0.4.1"
-tokio = {version= "1.33.0"}
-axum = {version= "0.6.20", optional = true}
 wasm-logger = "0.2.0"
+
 [features]
 default = []
-ssr = ["dioxus-fullstack/axum", "axum"]
+ssr = ["dioxus-fullstack/axum", "axum", "dioxus-ssr"]
 web = ["dioxus-fullstack/web", "red-siren-lib/web"]

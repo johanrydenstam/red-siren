@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = [
-  "red-siren-web",
-  "red-siren-lib"
-]
+members = ["red-siren-web", "red-siren-lib"]
+
+
+[workspace.dependencies]
+dioxus = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus" }
+dioxus-web = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus-web" }
+dioxus-fullstack = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus-fullstack" }
+dioxus-ssr = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval",  package = "dioxus-ssr" }
+log = "0.4.19"
+
