@@ -42,7 +42,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 8EA6E09EE87596B896068D0E /* Shared */;
 			proxyType = 1;
-			remoteGlobalIDString = CA60ACD85ECB522D2C86E215;
+			remoteGlobalIDString = CA02FA85CE9E4296ADE0F606;
 			remoteInfo = "uniffi-bindgen-bin";
 		};
 		6EC78E6AA13637C891278065 /* PBXContainerItemProxy */ = {
@@ -56,7 +56,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 8EA6E09EE87596B896068D0E /* Shared */;
 			proxyType = 1;
-			remoteGlobalIDString = CA607A8B44DC564A772C0BD1;
+			remoteGlobalIDString = CA0049BF7D4FD346A0A05154;
 			remoteInfo = "shared-staticlib";
 		};
 		CCE0790C2AA1F71400CD4B57 /* PBXContainerItemProxy */ = {
@@ -76,7 +76,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1974E5BC3D6D22A1D5676B40 /* SimpleCounter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SimpleCounter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1974E5BC3D6D22A1D5676B40 /* SimpleCounter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleCounter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		258EC994D7C693E3141C4563 /* core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = core.swift; sourceTree = "<group>"; };
 		642CF26F4B57B0FF7348C6BF /* SharedTypes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SharedTypes; path = ../shared_types/generated/swift/SharedTypes; sourceTree = SOURCE_ROOT; };
 		842F8D01CC76E9BFCDBD2862 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -291,7 +291,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SimpleCounter/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -313,7 +313,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SimpleCounter/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
