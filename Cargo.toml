@@ -1,12 +1,15 @@
 [workspace]
-resolver = "2"
-members = ["red-siren-web", "red-siren-lib"]
+members = ["shared", "shared_types", "web-leptos", "web-yew"]
+resolver = "1"
 
+[workspace.package]
+authors = ["Red Badger Consulting Limited"]
+edition = "2021"
+repository = "https://github.com/redbadger/crux/"
+license = "Apache-2.0"
+keywords = ["crux", "crux_core", "cross-platform-ui", "ffi", "wasm"]
+rust-version = "1.66"
 
 [workspace.dependencies]
-dioxus = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus" }
-dioxus-web = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus-web" }
-dioxus-fullstack = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval", package = "dioxus-fullstack" }
-dioxus-ssr = { git="https://github.com/ealmloff/dioxus.git", branch="ssr-eval",  package = "dioxus-ssr" }
-log = "0.4.19"
-
+anyhow = "1.0.75"
+serde = "1.0.189"
