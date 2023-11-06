@@ -1,5 +1,5 @@
 use crux_core::typegen::TypeGen;
-use shared::CatFacts;
+use shared::{RedSiren, Activity};
 use std::path::PathBuf;
 
 fn main() {
@@ -7,7 +7,9 @@ fn main() {
 
     let mut gen = TypeGen::new();
 
-    gen.register_app::<CatFacts>().expect("register");
+    gen.register_app::<RedSiren>().expect("register");
+
+    gen.register_type::<Activity>().expect("register activity");
 
     let output_root = PathBuf::from("./generated");
 
@@ -15,7 +17,7 @@ fn main() {
         .expect("swift type gen failed");
 
     gen.java(
-        "com.redbadger.catfacts.shared_types",
+        "com.anvlkv.redsiren.shared_types",
         output_root.join("java"),
     )
     .expect("java type gen failed");

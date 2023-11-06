@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.android'
+    namespace 'com.anvlkv.redsiren'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.android"
+        applicationId "com.anvlkv.redsiren"
         minSdk 28
         targetSdk 34
         versionCode 1

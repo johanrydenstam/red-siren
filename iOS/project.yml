@@ -1,4 +1,4 @@
-name: CatFacts
+name: RedSiren
 projectReferences:
   Shared:
     path: ../shared/shared.xcodeproj
@@ -6,14 +6,14 @@ packages:
   SharedTypes:
     path: ../shared_types/generated/swift/SharedTypes
 options:
-  bundleIdPrefix: com.example.catfacts
+  bundleIdPrefix: com.anvlkv.redsiren
 targets:
-  CatFacts:
+  RedSiren:
     type: application
     platform: iOS
     deploymentTarget: "15.0"
     sources:
-      - CatFacts
+      - RedSiren
       - path: ../shared/src/shared.udl
         buildPhase: sources
     dependencies:
@@ -21,7 +21,7 @@ targets:
       - target: Shared/shared-staticlib
       - package: SharedTypes
     info:
-      path: CatFacts/Info.plist
+      path: RedSiren/Info.plist
       properties:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.redbadger.catfacts.shared'
+    namespace 'com.anvlkv.redsiren.shared'
     compileSdk 34
     ndkVersion "26.1.10909125"
 

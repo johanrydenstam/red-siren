@@ -12,6 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Android"
+rootProject.name = "RedSiren"
 include ':app'
 include ':shared'

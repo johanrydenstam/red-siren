@@ -1,26 +1,33 @@
-# red-siren
+# Red Siren
+
 
 ## Development
-1. Install npm: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
-2. Install the tailwind css cli: https://tailwindcss.com/docs/installation
-3. Run the following command in the root of the project to start the tailwind CSS compiler:
 
-```bash
-npx tailwindcss -c ./red-siren-lib/tailwind.config.js -i ./red-siren-lib/input.css -o ./public/tailwind.css --watch
+Red Siren is built using [`crux`](https://github.com/redbadger/crux)
+
+### Shared
+
+```
+cargo build --package shared  
+    Finished dev [unoptimized + debuginfo] target(s) in 10.58s
 ```
 
-Run the following command in the root of the project to start the Dioxus dev server:
-
-```bash
-cd red-siren-web
-dx build --features web
-dx serve --features ssr --hot-reload --platform desktop
+```
+cargo build --package shared_types
+    Finished dev [unoptimized + debuginfo] target(s) in 10.58s
 ```
 
-```bash
-cargo watch -s "dx build --features web 
-dx serve --features ssr --platform desktop --bin red-siren-web"
+### Web (leptos)
+
+```
+cd web-leptos
+trunk serve
 ```
 
-- Open the browser to http://localhost:8080
+### iOS
 
+Open `iOS/RedSiren.xcodeproj` with Xcode. Adjust the [swift tools version if necessary](https://github.com/redbadger/crux/issues/152) 
+
+### Android
+
+Open `Android/` with Android studio

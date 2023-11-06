@@ -12,12 +12,12 @@ pub use crux_time as time;
 
 pub use app::*;
 
-// TODO hide this plumbing
+// TODO see if crux already does it.
 
 uniffi::include_scaffolding!("shared");
 
 lazy_static! {
-    static ref CORE: Bridge<Effect, CatFacts> = Bridge::new(Core::new::<CatFactCapabilities>());
+    static ref CORE: Bridge<Effect, RedSiren> = Bridge::new(Core::new::<RedSirenCapabilities>());
 }
 
 #[wasm_bindgen]
