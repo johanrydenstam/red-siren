@@ -1,14 +1,17 @@
 module.exports = {
-  mode: "jit",
   content: {
-    files: ["src/**/*.rs", "index.html"],
+    relative: true,
+    files: ["./src/**/*.rs", "index.html"],
   },
   darkMode: "media", // 'media' or 'class'
   theme: {
-    extend: {},
+    colors: {
+      red: '#E30022',
+      black: '#353839',
+      gray: '#36454F',
+    }
   },
   variants: {
-    extend: {},
   },
   plugins: [],
 };

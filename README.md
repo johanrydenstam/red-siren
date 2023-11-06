@@ -21,7 +21,7 @@ cargo build --package shared_types
 
 ```
 cd web-leptos
-trunk serve
+cargo leptos watch
 ```
 
 ### iOS

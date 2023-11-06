@@ -3,13 +3,21 @@ members = ["shared", "shared_types", "web-leptos"]
 resolver = "1"
 
 [workspace.package]
-authors = ["Red Badger Consulting Limited"]
+authors = ["a.nvlkv <a.nvlkv@protonmail.ch>"]
 edition = "2021"
-repository = "https://github.com/redbadger/crux/"
-license = "Apache-2.0"
-keywords = ["crux", "crux_core", "cross-platform-ui", "ffi", "wasm"]
+repository = "https://github.com/anvlkv/red-siren"
+license = "CC0 1.0 Universal"
 rust-version = "1.66"
+keywords = ["music", "game"]
 
 [workspace.dependencies]
 anyhow = "1.0.75"
 serde = "1.0.189"
+
+# Defines a size-optimized profile for the WASM bundle in release mode
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"

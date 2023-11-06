@@ -1,0 +1,22 @@
+main {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.splash {
+  position: relative;
+}
+.splash svg {
+  position: absolute;
+  height: 100%;
+  width: auto;
+  top:0;
+  left: 0;
+}
+#siren, #siren-front, #flute {
+  right: 0;
+  bottom: 0;
+  left: auto;
+  top: auto;
+}

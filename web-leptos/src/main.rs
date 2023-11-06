@@ -1,25 +1,40 @@
-mod core;
+#[cfg(feature = "ssr")]
+#[tokio::main]
+async fn main() {
+    use axum::{routing::post, Router};
+    use leptos::*;
+    use leptos_axum::{generate_route_list, LeptosRoutes};
+    use web_leptos::app::*;
+    use web_leptos::fileserv::file_and_error_handler;
 
-use leptos::{component, create_effect, create_signal, view, IntoView, SignalGet, SignalUpdate};
-use shared::Event;
+    simple_logger::init_with_level(log::Level::Debug).expect("couldn't initialize logging");
 
-#[component]
-fn RootComponent() -> impl IntoView {
-    // let core = core::new();
-    // let (view, render) = create_signal(core.view());
-    // let (event, set_event) = create_signal(Event::Reset);
+    // Setting get_configuration(None) means we'll be using cargo-leptos's env values
+    // For deployment these variables are:
+    // <https://github.com/leptos-rs/start-axum#executing-a-server-on-a-remote-machine-without-the-toolchain>
+    // Alternately a file can be specified such as Some("Cargo.toml")
+    // The file would need to be included with the executable when moved to deployment
+    let conf = get_configuration(None).await.unwrap();
+    let leptos_options = conf.leptos_options;
+    let addr = leptos_options.site_addr;
+    let routes = generate_route_list(RootComponent);
 
-    // create_effect(move |_| {
-    //     core::update(&core, event.get(), render);
-    // });
+    // build our application with a route
+    let app = Router::new()
+        .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
+        .leptos_routes(&leptos_options, routes, RootComponent)
+        .fallback(file_and_error_handler)
+        .with_state(leptos_options);
 
-    view! {
-        <div>{"hello siren"}</div>
-    }
+    // run our app with hyper
+    // `axum::Server` is a re-export of `hyper::Server`
+    log::info!("listening on http://{}", &addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
+#[cfg(not(feature = "ssr"))]
 fn main() {
-    leptos::mount_to_body(|| {
-        view! { <RootComponent /> }
-    });
 }

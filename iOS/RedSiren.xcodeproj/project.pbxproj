@@ -16,6 +16,7 @@
 		91A375A39D8A4F827B873AF3 /* RedSirenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F008C3C1A819A3D7658E59 /* RedSirenApp.swift */; };
 		C6A871270F87D449FB7FE5C4 /* uniffi-bindgen in Resources */ = {isa = PBXBuildFile; fileRef = 4D27A7B150B96621935C1300 /* uniffi-bindgen */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F68573BF507ACC074620C5D8 /* libshared_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A500489520C085A22DE7285 /* libshared_static.a */; };
+		FAB686542AF94B7D00225C44 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FAB686532AF94B7D00225C44 /* Launch Screen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -88,6 +89,7 @@
 		BA04D6CC7F18E9A653D26BDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BEED0A11FB2044F35FBCD25B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F7A91C46D50C923426AE058D /* Shared */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Shared; path = ../shared/shared.xcodeproj; sourceTree = "<group>"; };
+		FAB686532AF94B7D00225C44 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 				1E4056BAC32CC8AC7A9740CA /* ContentView.swift */,
 				194A00C08EEF11C3CC1340EE /* core.swift */,
 				BA04D6CC7F18E9A653D26BDD /* Info.plist */,
+				FAB686532AF94B7D00225C44 /* Launch Screen.storyboard */,
 				B5007F506D99687AEC368328 /* Preview Content */,
 			);
 			path = RedSiren;
@@ -267,6 +270,7 @@
 			files = (
 				334B08822AC4D801207951A0 /* Assets.xcassets in Resources */,
 				831E091105B555E7D0085CF4 /* Preview Assets.xcassets in Resources */,
+				FAB686542AF94B7D00225C44 /* Launch Screen.storyboard in Resources */,
 				C6A871270F87D449FB7FE5C4 /* uniffi-bindgen in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -424,9 +428,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = M59X77GZ2V;
 				INFOPLIST_FILE = RedSiren/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Red Siren";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -447,9 +454,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = M59X77GZ2V;
 				INFOPLIST_FILE = RedSiren/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Red Siren";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

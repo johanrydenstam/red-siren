@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Android" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Allows us to override night specific attributes in the
+         values-night folder. -->
+    <style name="NightAdjusted.Theme.RedSiren" parent="android:Theme.Material.NoActionBar" >
+        <item name="android:windowBackground">@color/red</item>
+        <item name="android:statusBarColor" >@color/red</item>
+        <item name="android:windowLightStatusBar" >true</item>
+        <item name="android:windowLightNavigationBar" >true</item>
+        <item name="android:navigationBarColor">@color/red</item>
+        <item name="android:color">@color/gray</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/ic_brand</item>
+    </style>
+
+    <!-- The final theme we use -->
+    <style name="Theme.RedSiren" parent="NightAdjusted.Theme.RedSiren" />
 </resources>
