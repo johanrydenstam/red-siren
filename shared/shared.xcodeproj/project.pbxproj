@@ -276,6 +276,7 @@
 				CARGO_XCODE_CARGO_DEP_FILE_NAME = libshared.d;
 				CARGO_XCODE_CARGO_FILE_NAME = libshared.dylib;
 				DYLIB_COMPATIBILITY_VERSION = 0;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				PRODUCT_NAME = shared;
 				SUPPORTED_PLATFORMS = macosx;
 			};
@@ -300,6 +301,7 @@
 			buildSettings = {
 				CARGO_XCODE_CARGO_DEP_FILE_NAME = "uniffi-bindgen.d";
 				CARGO_XCODE_CARGO_FILE_NAME = "uniffi-bindgen";
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				PRODUCT_NAME = "uniffi-bindgen";
 				SUPPORTED_PLATFORMS = macosx;
 			};
@@ -311,6 +313,7 @@
 				CARGO_XCODE_CARGO_DEP_FILE_NAME = libshared.d;
 				CARGO_XCODE_CARGO_FILE_NAME = libshared.dylib;
 				DYLIB_COMPATIBILITY_VERSION = 0;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				PRODUCT_NAME = shared;
 				SUPPORTED_PLATFORMS = macosx;
 			};
@@ -335,6 +338,7 @@
 			buildSettings = {
 				CARGO_XCODE_CARGO_DEP_FILE_NAME = "uniffi-bindgen.d";
 				CARGO_XCODE_CARGO_FILE_NAME = "uniffi-bindgen";
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				PRODUCT_NAME = "uniffi-bindgen";
 				SUPPORTED_PLATFORMS = macosx;
 			};
