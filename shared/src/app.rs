@@ -1,24 +1,25 @@
-use serde::{Deserialize, Serialize};
-use anyhow::Result;
+use crux_core::{render::Render, Capability};
 pub use crux_core::App;
-use crux_core::render::Render;
 use crux_kv::KeyValue;
 use crux_macros::Effect;
+use serde::{Deserialize, Serialize};
 
-mod instrument;
-mod tuner;
-mod intro;
+pub mod instrument;
+pub mod intro;
+pub mod tuner;
 
 pub use instrument::Instrument;
-pub use tuner::Tuner;
 pub use intro::Intro;
+pub use tuner::Tuner;
+
+use self::{intro::IntroCapabilities, tuner::TunerCapabilities, instrument::InstrumentCapabilities};
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Activity {
     Intro,
     Tune,
     Play,
-    Listen
+    Listen,
 }
 
 impl Default for Activity {
@@ -32,24 +33,30 @@ pub struct Model {
     instrument: instrument::Model,
     tuning: tuner::Model,
     intro: intro::Model,
-    activity: Activity
+    activity: Activity,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 pub struct ViewModel {
-    activity: Activity
+    pub activity: Activity,
+    pub intro: intro::ViewModel,
+    pub tuning: tuner::Model,
+    pub instrument: instrument::ViewModel,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub enum Event {
     None,
+    TunerEvent(tuner::Event),
+    InstrumentEvent(instrument::Event),
+    IntroEvent(intro::Event),
 }
 
 #[derive(Default)]
 pub struct RedSiren {
-    tuner: Tuner,
-    instrument: Instrument,
-    intro: Intro,
+    pub tuner: Tuner,
+    pub instrument: Instrument,
+    pub intro: Intro,
 }
 
 #[cfg_attr(feature = "typegen", derive(crux_macros::Export))]
@@ -60,6 +67,33 @@ pub struct RedSirenCapabilities {
     pub key_value: KeyValue<Event>,
 }
 
+impl From<&RedSirenCapabilities> for IntroCapabilities {
+    fn from(incoming: &RedSirenCapabilities) -> Self {
+        IntroCapabilities {
+            key_value: incoming.key_value.map_event(super::Event::IntroEvent),
+            render: incoming.render.map_event(super::Event::IntroEvent),
+        }
+    }
+}
+
+impl From<&RedSirenCapabilities> for TunerCapabilities {
+    fn from(incoming: &RedSirenCapabilities) -> Self {
+        TunerCapabilities {
+            key_value: incoming.key_value.map_event(super::Event::TunerEvent),
+            render: incoming.render.map_event(super::Event::TunerEvent),
+        }
+    }
+}
+
+impl From<&RedSirenCapabilities> for InstrumentCapabilities {
+    fn from(incoming: &RedSirenCapabilities) -> Self {
+        InstrumentCapabilities {
+            key_value: incoming.key_value.map_event(super::Event::InstrumentEvent),
+            render: incoming.render.map_event(super::Event::InstrumentEvent),
+        }
+    }
+}
+
 impl App for RedSiren {
     type Model = Model;
     type Event = Event;
@@ -68,14 +102,25 @@ impl App for RedSiren {
 
     fn update(&self, msg: Event, model: &mut Model, caps: &RedSirenCapabilities) {
         match msg {
-            Event::None => {}
+            Event::None => {
+                caps.render.render();
+            }
+            Event::InstrumentEvent(event) => {
+                self.instrument
+                    .update(event, &mut model.instrument, &caps.into())
+            }
+            Event::TunerEvent(event) => self.tuner.update(event, &mut model.tuning, &caps.into()),
+            Event::IntroEvent(event) => self.intro.update(event, &mut model.intro, &caps.into()),
         }
-
-        caps.render.render();
     }
 
     fn view(&self, model: &Model) -> ViewModel {
-        ViewModel { activity: model.activity }
+        ViewModel {
+            activity: model.activity,
+            tuning: self.tuner.view(&model.tuning),
+            intro: self.intro.view(&model.intro),
+            instrument: self.instrument.view(&model.instrument)
+        }
     }
 }
 

@@ -9,14 +9,15 @@ use crux_macros::Effect;
 #[derive(Default)]
 pub struct Tuner;
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Model {
 
 }
 
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub enum Event {
   GetTuning,
-  SetTuning(Model),
+  SetTuning,
 
 }
 
@@ -42,6 +43,6 @@ impl App for Tuner {
     }
 
     fn view(&self, model: &Self::Model) -> Self::ViewModel {
-        todo!()
+        Model::default()
     }
 }

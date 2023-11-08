@@ -6,17 +6,25 @@ main {
 
 .splash {
   position: relative;
-}
-.splash svg {
-  position: absolute;
-  height: 100%;
-  width: auto;
-  top:0;
-  left: 0;
-}
-#siren, #siren-front, #flute {
-  right: 0;
-  bottom: 0;
-  left: auto;
-  top: auto;
+  svg {
+    position: absolute;
+    height: 100%;
+    width: auto;
+    top: 0;
+    left: 0;
+    &#siren,
+    &#siren-front,
+    &#flute,
+    &#stone,
+    &#flute-shadow,
+    &#siren-arm {
+      right: 0;
+      bottom: 0;
+      left: auto;
+      top: auto;
+    }
+    &:not(#flute):not(#sun) {
+      opacity: var(--intro-opacity)
+    }
+  }
 }
