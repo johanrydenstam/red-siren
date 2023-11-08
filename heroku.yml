@@ -1,0 +1,5 @@
+build:
+  docker:
+    web: ./web-leptos/Dockerfile
+run:
+  web: ./target/release/web-leptos

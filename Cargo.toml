@@ -4,10 +4,10 @@ resolver = "1"
 
 [workspace.package]
 authors = ["a.nvlkv <a.nvlkv@protonmail.ch>"]
-edition = "2021"
 repository = "https://github.com/anvlkv/red-siren"
+edition = "2021"
 license = "CC0 1.0 Universal"
-rust-version = "1.66"
+rust-version = "1.67"
 keywords = ["music", "game"]
 
 [workspace.dependencies]

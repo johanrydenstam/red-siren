@@ -1,7 +1,7 @@
-name = "Simple Counter"
-description = "A _very_ simple counter core, which is wrapped with multiple shells"
-authors = ["Red Badger Consulting Limited"]
-repository = "https://github.com/redbadger/crux/"
+name = "Red Siren"
+description = "Musical instrument"
+authors = ["a.nvlkv <a.nvlkv@protonmail.ch>"]
+repository = "https://github.com/anvlkv/red-siren"
 
 [cores.shared]
 source = "shared"
