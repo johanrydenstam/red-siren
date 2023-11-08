@@ -1700,6 +1700,7 @@ dependencies = [
 [[package]]
 name = "leptos-use"
 version = "0.8.1"
+source = "git+https://github.com/anvlkv/leptos-use.git#2cf5a0edc8c7af3c65fe36fb2f9a6ed02d3dfbd9"
 dependencies = [
  "cfg-if",
  "default-struct-builder",
