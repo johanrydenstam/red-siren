@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'org.mozilla.rust-android-gradle.rust-android'
+    id 'com.github.willir.rust.cargo-ndk-android'
 }
 
 android {
@@ -15,6 +15,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
 
     buildTypes {
@@ -33,6 +39,13 @@ android {
 
     sourceSets {
         main.java.srcDirs += "${projectDir}/../../shared_types/generated/java"
+        main.jniLibs.srcDirs += "src/main/jniLibs"
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
     }
 }
 
@@ -47,17 +60,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
-apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+apply plugin: 'com.github.willir.rust.cargo-ndk-android'
 
-cargo {
-    module  = "../.."
-    libname = "shared"
-    // these are the four recommended targets for Android that will ensure your library works on all mainline android devices
-    // make sure you have included the rust toolchain for each of these targets: \
-    // `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
+cargoNdk {
     targets = ["arm", "arm64", "x86", "x86_64"]
-    extraCargoBuildArguments = ['--package', 'shared', '--features', 'android']
-    pythonCommand="python3"
+    module = "../"
+    librariesNames = ["libffirs.so"]
+    extraCargoBuildArguments = ['--package', 'uniffi-bindgen', '--lib', '--features', 'android']
 }
 
 afterEvaluate {
@@ -69,15 +78,16 @@ afterEvaluate {
         }
         def buildType = "${variant.buildType.name.capitalize()}"
 
-        tasks.named("compileDebugKotlin") {
+        tasks.named("compile${buildType}Kotlin") {
             it.dependsOn(tasks.named("typesGen"), tasks.named("bindGen"))
         }
 
-        tasks.named("generate${productFlavor}${buildType}Assets") {
-            it.dependsOn(tasks.named("cargoBuild"))
+        tasks.named("compile${buildType}JavaWithJavac") {
+            it.dependsOn(tasks.named("typesGen"), tasks.named("bindGen"), tasks.named("buildCargoNdk${buildType}"))
         }
     }
 }
+
 
 tasks.register('bindGen', Exec) {
     def outDir = "${projectDir}/../../shared_types/generated/java"
@@ -85,8 +95,8 @@ tasks.register('bindGen', Exec) {
     if (System.getProperty('os.name').toLowerCase().contains('windows')) {
         commandLine(
                 "cmd", "/c",
-                "cargo build -p shared && " +
-                        "target\\debug\\uniffi-bindgen generate shared\\src\\shared.udl " +
+                "cargo build -p uniffi-bindgen && " +
+                        "target\\debug\\uniffi-bindgen generate --library target\\debug\\libffirs.so" +
                         "--language kotlin " +
                         "--out-dir " + outDir.replace('/', '\\')
         )
@@ -94,8 +104,8 @@ tasks.register('bindGen', Exec) {
         commandLine(
                 "sh", "-c",
                 """\
-                cargo build -p shared && \
-                target/debug/uniffi-bindgen generate shared/src/shared.udl \
+                cargo build -p uniffi-bindgen && \
+                target/debug/uniffi-bindgen generate --library target/debug/libffirs.dylib \
                 --language kotlin \
                 --out-dir $outDir
                 """

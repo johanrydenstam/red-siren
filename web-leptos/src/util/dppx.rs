@@ -1,4 +1,4 @@
-#![cfg_attr(feature = "ssr", allow(unused_variables, unused_imports, dead_code))]
+#![allow(unused_variables, unused_imports, dead_code)]
 
 use cfg_if::cfg_if;
 use leptos::ev::change;
@@ -11,10 +11,10 @@ type RemoveListener = Rc<RefCell<Option<Box<dyn Fn()>>>>;
 
 /// as seen in [leptos_use::use_media_query] implementation
 pub fn use_dppx() -> Signal<f64> {
-    let (dppx, set_dppx) = create_signal(1.0 as f64);
+    let (dppx, set_dppx) = create_signal(1.0_f64);
     let window = use_window();
 
-    cfg_if! { if #[cfg(feature = "hydrate")] {
+    cfg_if! { if #[cfg(feature = "browser")] {
       let media_query: Rc<RefCell<Option<web_sys::MediaQueryList>>> = Rc::new(RefCell::new(None));
       let remove_listener: RemoveListener = Rc::new(RefCell::new(None));
 

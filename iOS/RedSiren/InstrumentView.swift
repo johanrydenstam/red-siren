@@ -149,18 +149,24 @@ struct InstrumentView: View {
         self.vSize = vm.config.height
         self.hSize = vm.config.width
     }
+    
 
     var body: some View {
         GeometryReader { proxy in
             ZStack {
                 InstrumentInboundStringView(line: self.vm.layout.inbound)
                 InstrumentOutboundStringView(line: self.vm.layout.outbound)
+                
                 ForEach(self.vm.layout.tracks, id: \.hashValue) { track in
                     InstrumentTrackView(rect: track)
                 }
+                
                 ForEach(self.vm.layout.buttons, id: \.hashValue) { btn in
                     InstrumentButtonView(rect: btn)
                 }
+                
+                MenuView(position: self.vm.layout.menu_position, expanded: false)
+                
             }.ignoresSafeArea(.all)
                 .frame(width: proxy.frame(in: .global).width, height: proxy.frame(in: .global).height)
         }.ignoresSafeArea(.all)

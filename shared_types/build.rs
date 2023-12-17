@@ -1,40 +1,68 @@
-use crux_core::typegen::TypeGen;
-use shared::{
-    geometry::{Line, Rect},
-    instrument::{Config, Instrument, Layout, InstrumentEV},
-    intro::IntroEV,
-    tuner::TunerEV,
-    navigate::NavigateOperation,
-    Activity, Intro, RedSiren, Tuner,
-};
 use std::path::PathBuf;
 
-fn main() {
+use crux_core::typegen::TypeGen;
+
+fn main() -> anyhow::Result<()> {
     println!("cargo:rerun-if-changed=../shared");
+    println!("cargo:rerun-if-changed=../aucore");
 
-    let mut gen = TypeGen::new();
+    {
+        use aucore::RedSirenAU;
+        use shared::instrument::{Config, Node};
 
-    gen.register_type::<Activity>().expect("register activity");
-    gen.register_type::<Line>().expect("register line");
-    gen.register_type::<Rect>().expect("register rect");
-    gen.register_type::<Config>().expect("register config");
-    gen.register_type::<Layout>().expect("register layout");
+        let mut gen = TypeGen::new();
+        gen.register_type::<Config>()?;
+        gen.register_type::<Node>()?;
+        gen.register_app::<RedSirenAU>()?;
 
-    gen.register_type::<IntroEV>().expect("register intro ev");
-    gen.register_type::<TunerEV>().expect("register tuner ev");
-    gen.register_type::<InstrumentEV>().expect("register instrument ev");
-    
-    
-    gen.register_app::<RedSiren>().expect("register RedSiren");
+        let output_root = PathBuf::from("./generated");
 
-    let output_root = PathBuf::from("./generated");
+        gen.swift("AUTypes", output_root.join("swift"))?;
 
-    gen.swift("SharedTypes", output_root.join("swift"))
-        .expect("swift type gen failed");
+        gen.java(
+            "com.anvlkv.redsiren.shared.au_types",
+            output_root.join("java"),
+        )?;
 
-    gen.java("com.anvlkv.redsiren.shared_types", output_root.join("java"))
-        .expect("java type gen failed");
+        gen.typescript("au_types", output_root.join("typescript"))?;
+    }
 
-    gen.typescript("shared_types", output_root.join("typescript"))
-        .expect("typescript type gen failed");
+    {
+        use shared::{
+            geometry::{Line, Rect},
+            instrument::{layout::MenuPosition, Config, InstrumentEV, Layout, Node, PlaybackEV},
+            intro::IntroEV,
+            tuner::TunerEV,
+            Activity, RedSiren,
+        };
+
+        let mut gen = TypeGen::new();
+        gen.register_type::<InstrumentEV>()?;
+        gen.register_type::<IntroEV>()?;
+        gen.register_type::<TunerEV>()?;
+        gen.register_type::<PlaybackEV>()?;
+
+        gen.register_type::<Activity>()?;
+        gen.register_type::<MenuPosition>()?;
+        gen.register_type::<Line>()?;
+        gen.register_type::<Rect>()?;
+        gen.register_type::<Config>()?;
+        gen.register_type::<Layout>()?;
+        gen.register_type::<Node>()?;
+
+        gen.register_app::<RedSiren>()?;
+
+        let output_root = PathBuf::from("./generated");
+
+        gen.swift("SharedTypes", output_root.join("swift"))?;
+
+        gen.java(
+            "com.anvlkv.redsiren.shared.shared_types",
+            output_root.join("java"),
+        )?;
+
+        gen.typescript("shared_types", output_root.join("typescript"))?;
+    }
+
+    Ok(())
 }

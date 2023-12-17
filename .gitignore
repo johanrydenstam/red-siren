@@ -16,6 +16,8 @@ public/tailwind.css
 
 /target
 
+pkg/
+
 .DS_Store
 
 dioxusin
@@ -25,3 +27,6 @@ dioxusin
 *.snap.new
 
 iOS/Pods/
+
+.vscode/
+.idea/

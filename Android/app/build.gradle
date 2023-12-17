@@ -72,7 +72,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Optional - Integration with activities
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.8.1")
     // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     // Optional - Integration with LiveData
@@ -80,10 +80,13 @@ dependencies {
 
 
     implementation project(path: ':shared')
+
     implementation "androidx.compose.material:material-icons-extended:1.5.4"
 
     implementation "io.ktor:ktor-client-cio:2.2.2"
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+
+    implementation "com.google.accompanist:accompanist-permissions:0.33.2-alpha"
 }

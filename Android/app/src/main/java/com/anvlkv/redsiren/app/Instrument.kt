@@ -1,24 +1,31 @@
 package com.anvlkv.redsiren.app
 
+import android.content.res.Resources
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.anvlkv.redsiren.shared_types.InstrumentEV
-import com.anvlkv.redsiren.shared_types.InstrumentVM
-import com.anvlkv.redsiren.shared_types.Line
-import com.anvlkv.redsiren.shared_types.Rect
+import com.anvlkv.redsiren.shared.shared_types.InstrumentEV
+import com.anvlkv.redsiren.shared.shared_types.InstrumentVM
+import com.anvlkv.redsiren.shared.shared_types.Line
+import com.anvlkv.redsiren.shared.shared_types.MenuPosition
+import com.anvlkv.redsiren.shared.shared_types.Rect
 import kotlin.math.min
+
 
 @Composable
 fun InstrumentButton(layoutRect: Rect) {
@@ -94,7 +101,10 @@ fun InstrumentTrack(layoutRect: Rect) {
 
 @Composable
 fun AppInstrument(vm: InstrumentVM, ev: (ev: InstrumentEV) -> Unit) {
-    Box (Modifier.fillMaxSize()) {
+    Box (
+        Modifier
+            .fillMaxSize()
+            .clipToBounds()) {
         InstrumentInboundString(layoutLine = vm.layout.inbound)
         InstrumentOutboundString(layoutLine = vm.layout.outbound)
 
@@ -105,6 +115,29 @@ fun AppInstrument(vm: InstrumentVM, ev: (ev: InstrumentEV) -> Unit) {
         vm.layout.buttons.forEach { rect ->
             InstrumentButton(layoutRect = rect)
         }
+    }
+
+    val menuRect = when (val position = vm.layout.menu_position) {
+        is MenuPosition.TopRight -> position.value
+        is MenuPosition.TopLeft -> position.value
+        is MenuPosition.BottomLeft -> position.value
+        is MenuPosition.Center -> position.value
+        else -> throw Error("unknown position")
+    }
+
+    val menuSize =
+        DpSize((menuRect.rect[1][0] - menuRect.rect[0][0]).dp, (menuRect.rect[1][1] - menuRect.rect[0][1]).dp)
+    val density = Resources.getSystem().displayMetrics.density
+
+    Box(
+        Modifier
+            .size(menuSize)
+            .graphicsLayer(
+                translationX = (menuRect.rect[0][0] * density.toDouble()).toFloat(),
+                translationY = (menuRect.rect[0][1] * density.toDouble()).toFloat(),
+            )
+    ) {
+        Menu(false)
     }
 }
 

@@ -1,20 +1,47 @@
-mod core;
-mod instrument;
-mod intro;
-
-use crate::{
-    util::use_dpi,
-    error_template::{AppError, ErrorTemplate},
-};
+use cfg_if::cfg_if;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 use leptos_use::{use_event_listener, use_window};
+
 use shared::{Activity, Event};
+
+use crate::{
+    error_template::{AppError, ErrorTemplate},
+    util::use_dpi,
+};
+
+mod core;
+mod instrument;
+mod intro;
+mod menu;
+
+cfg_if! { if #[cfg(feature="browser")]{
+    mod playback;
+} else {
+    mod playback {
+
+        #[derive(Clone)]
+        pub struct Playback;
+
+        impl Playback {
+            pub fn new() -> Self {
+                Self
+            }
+        }
+    }
+}}
+
+pub fn provide_playback() {
+    let (r_op, _) = create_signal::<playback::Playback>(playback::Playback::new());
+    provide_context(r_op)
+}
 
 #[component]
 pub fn RootComponent() -> impl IntoView {
     provide_meta_context();
+
+    provide_playback();
 
     view! {
         <Stylesheet id="leptos" href="/pkg/red-siren.css"/>
@@ -41,7 +68,9 @@ pub fn RootComponent() -> impl IntoView {
         <Meta name="msapplication-wide310x150logo" content="/favicon/mstile-310x150.png" />
         <Meta name="msapplication-square310x310logo" content="/favicon/mstile-310x310.png" />
         <Meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-
+        <Style>
+            {"@import url('https://fonts.googleapis.com/css2?family=Rosarivo:ital@0;1&display=swap');"}
+        </Style>
 
         <Router fallback=|| {
           let mut outside_errors = Errors::default();
@@ -51,24 +80,24 @@ pub fn RootComponent() -> impl IntoView {
           }
           .into_view()
       }>
-          <main>
-              <RedSirenRoutes/>
+          <main class="bg-red dark:bg-black text-black dark:text-red font-serif">
+              <RedSirenCore/>
           </main>
       </Router>
     }
 }
 
 #[component]
-fn RedSirenRoutes() -> impl IntoView {
+fn RedSirenCore() -> impl IntoView {
     let core = core::new();
     let view_rw_signal = create_rw_signal(core.view());
     let view = view_rw_signal.read_only();
     let render = view_rw_signal.write_only();
-
+    let playback = use_context::<ReadSignal<playback::Playback>>().unwrap();
     let (event, set_event) = create_signal(Event::Start);
 
     create_effect(move |_| {
-        core::update(&core, event.get(), render);
+        core::update(&core, event.get(), render, playback.get());
     });
 
     let location = leptos_router::use_location();
@@ -78,6 +107,7 @@ fn RedSirenRoutes() -> impl IntoView {
         "/tune" => set_event(Event::Activate(Activity::Tune)),
         "/play" => set_event(Event::Activate(Activity::Play)),
         "/listen" => set_event(Event::Activate(Activity::Listen)),
+        "/about" => set_event(Event::Activate(Activity::About)),
         _ => panic!("route not using activity"),
     });
 
@@ -88,6 +118,7 @@ fn RedSirenRoutes() -> impl IntoView {
             Activity::Tune => "/tune",
             Activity::Play => "/play",
             Activity::Listen => "/listen",
+            Activity::About => "/about",
         };
 
         navigate(path, Default::default())
@@ -95,9 +126,10 @@ fn RedSirenRoutes() -> impl IntoView {
 
     let (size, set_size) = create_signal((0, 0));
     let window = use_window();
-    let _ = use_event_listener(window.clone(), leptos::ev::resize, move |_| {
+    _ = use_event_listener(window.clone(), leptos::ev::resize, move |_| {
         let body = window.document().body().unwrap();
-        set_size.set((body.client_width(), body.client_height()));
+        let new_size = (body.client_width(), body.client_height());
+        set_size.set(new_size);
     });
 
     let window = use_window();
@@ -123,6 +155,8 @@ fn RedSirenRoutes() -> impl IntoView {
     let intro_ev = SignalSetter::map(move |ev| set_event.set(Event::IntroEvent(ev)));
     let instrument_vm = create_read_slice(view_rw_signal, move |v| v.instrument.clone());
     let instrument_ev = SignalSetter::map(move |ev| set_event.set(Event::InstrumentEvent(ev)));
+
+    provide_context(set_event);
 
     view! {
         <Routes>
