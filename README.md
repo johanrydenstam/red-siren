@@ -1,5 +1,24 @@
-# Red Siren
+# Red Siren (work in progress...)
 
+<p>Red Siren is a noise chime.</p>
+<dl>
+    <dt>Red</dt>
+        <dd>The color red and its many meanings.</dd>
+    <dt>Siren</dt>
+        <dd>Siren - the mythical creature, but also the alarm.</dd>
+    <dt>is</dt>
+        <dd>It exists right now.</dd>
+    <dt>a</dt>
+        <dd>It's a choice, one of many, and therefore any.</dd>
+    <dt>noise</dt>
+        <dd>Random or unwanted sounds.</dd>
+    <dt>chime</dt>
+        <dd>The musical instrument.</dd>
+</dl>
+
+## Artistic project
+
+This is an artistic project by a.nvlkv. May it serve the awakening by making the listeners more aware of the noises in their evironment.
 
 ## Development
 
