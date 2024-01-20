@@ -1,54 +1,32 @@
 import {
   PlayOperation,
   PlayOperationVariantPermissions,
-  PlayOperationOutputVariantPermission,
   PlayOperationOutputVariantSuccess,
+  PlayOperationOutputVariantFailure,
   PlayOperationVariantInstallAU,
   PlayOperationVariantResume,
   PlayOperationVariantSuspend,
-} from "shared_types/types/au_types";
+} from "typegen/types/au_types";
 import { RedSirenNode } from "./node";
-import {
-  BincodeDeserializer,
-  BincodeSerializer,
-} from "shared_types/bincode/mod";
+import { BincodeDeserializer, BincodeSerializer } from "typegen/bincode/mod";
 
 export class PlaybackBridge {
   private ctx?: AudioContext;
-  private worklet?: RedSirenNode;
+  private redSirenNode?: RedSirenNode;
   private inputNode?: MediaStreamAudioSourceNode;
-  private registry = new Map<
-    string,
-    [(data: Uint8Array) => void, (reason: any) => void]
-  >();
 
-  // #[wasm_bindgen(structural, method, getter, js_name = callHost, js_class = "PlaybackBridge")]
-  // pub fn call_host_block(this: &PlaybackJs) -> Option<::js_sys::Function>;
+  public on_capture?: (data: Uint8Array) => void;
 
-  // #[wasm_bindgen(structural, method, setter, js_name = callHost, js_class = "PlaybackBridge")]
-  // pub fn set_call_host_block(this: &PlaybackJs, val: Option<&::js_sys::Function>);
-  public callHost?: any;
-
-  constructor() {}
-
-  onResolve = (out: Uint8Array, id?: string) => {
-    if (id) {
-      this.registry.get(id)![0](out);
-      this.registry.delete(id);
-    } else if (this.callHost) {
-      this.callHost(out);
-    } else {
-      console.log(out);
-    }
+  private current_resolve = (out: Uint8Array) => {};
+  onResolve = (out: Uint8Array) => {
+    this.current_resolve(out);
   };
 
-  // #[wasm_bindgen(method, js_class = "PlaybackBridge")]
-  // pub fn request(this: &PlaybackJs, req: &JsValue) -> Promise;
   public async request(bytes: Uint8Array): Promise<Uint8Array> {
     const op = PlayOperation.deserialize(new BincodeDeserializer(bytes));
     const ser = new BincodeSerializer();
 
-    if (!this.ctx || !this.worklet || !this.inputNode) {
+    if (!this.ctx || !this.redSirenNode || !this.inputNode) {
       switch (op.constructor) {
         case PlayOperationVariantPermissions: {
           try {
@@ -61,33 +39,37 @@ export class PlaybackBridge {
             this.ctx = ctx;
             this.inputNode = inputNode;
 
-            new PlayOperationOutputVariantPermission(true).serialize(ser);
+            console.log("permissions");
+            new PlayOperationOutputVariantSuccess().serialize(ser);
           } catch (e) {
             console.error(e);
-            new PlayOperationOutputVariantPermission(false).serialize(ser);
+            new PlayOperationOutputVariantFailure().serialize(ser);
           }
           return ser.getBytes();
         }
         case PlayOperationVariantInstallAU: {
           try {
             await RedSirenNode.addModule(this.ctx!);
-            this.worklet = new RedSirenNode(this.ctx!);
+            this.redSirenNode = new RedSirenNode(this.ctx!);
             console.log("init worklet");
-            await this.worklet!.init();
-            
-            this.inputNode!.connect(this.worklet!).connect(
+            await this.redSirenNode!.init();
+            this.redSirenNode.onResolve = this.onResolve;
+            this.redSirenNode.onCapture = this.on_capture!;
+            this.inputNode!.connect(this.redSirenNode!).connect(
               this.ctx!.destination
             );
-            this.worklet.onResolve = this.onResolve;
 
-            new PlayOperationOutputVariantSuccess(true).serialize(ser);
+            await this.ctx.suspend();
+
+            new PlayOperationOutputVariantSuccess().serialize(ser);
           } catch (e) {
             console.error(e);
-            new PlayOperationOutputVariantSuccess(false).serialize(ser);
+            new PlayOperationOutputVariantFailure().serialize(ser);
           }
           return ser.getBytes();
         }
         default: {
+          console.error("unprepared for:", op.constructor);
           throw new Error("init before requesting capabilities");
         }
       }
@@ -96,37 +78,36 @@ export class PlaybackBridge {
         case PlayOperationVariantResume: {
           try {
             await this.ctx.resume();
-
-            new PlayOperationOutputVariantSuccess(true).serialize(ser);
+            this.redSirenNode?.clearBuffer();
+            console.log("resumed");
+            new PlayOperationOutputVariantSuccess().serialize(ser);
           } catch (e) {
             console.error(e);
-            new PlayOperationOutputVariantSuccess(false).serialize(ser);
+            new PlayOperationOutputVariantFailure().serialize(ser);
           }
           return ser.getBytes();
         }
         case PlayOperationVariantSuspend: {
           try {
             await this.ctx.suspend();
-
-            new PlayOperationOutputVariantSuccess(true).serialize(ser);
+            console.log("suspended");
+            new PlayOperationOutputVariantSuccess().serialize(ser);
           } catch (e) {
             console.error(e);
-            new PlayOperationOutputVariantSuccess(false).serialize(ser);
+            new PlayOperationOutputVariantFailure().serialize(ser);
           }
           return ser.getBytes();
         }
         default: {
           console.log("forwarding");
           try {
-            const crypto = window.crypto;
-            const id = crypto.randomUUID();
             return new Promise((resolve, reject) => {
-              this.registry.set(id, [resolve, reject]);
-              this.worklet.forwardWithId(bytes, id);
+              this.current_resolve = resolve;
+              this.redSirenNode.forward(bytes);
             });
           } catch (e) {
             console.error(e);
-            new PlayOperationOutputVariantSuccess(false).serialize(ser);
+            new PlayOperationOutputVariantFailure().serialize(ser);
             return ser.getBytes();
           }
         }

@@ -15,26 +15,25 @@
     }
   },
   "scripts": {
-    "dev": "pnpm types:build && pnpm wasm:build && pnpm vite",
     "build": "pnpm types:build && pnpm wasm:build && pnpm tsc && pnpm vite build",
     "build:dev": "pnpm types:build && pnpm wasm:build:dev && pnpm tsc && pnpm vite build",
     "preview": "pnpm types:build && pnpm wasm:build && pnpm vite preview",
     "vite:build": "pnpm tsc && pnpm vite build",
-    "types:build": "cd ../../shared_types && cargo build",
+    "types:build": "cd ../../typegen && cargo build",
     "wasm:build": "cd ../../aucore && wasm-pack build --target web --features browser",
     "wasm:build:dev": "cd ../../aucore && RUST_BACKTRACE=1 wasm-pack build --debug --target web --features browser"
   },
   "devDependencies": {
     "@types/audioworklet": "^0.0.52",
     "@types/dat.gui": "^0.7.12",
-    "@types/node": "^20.10.1",
+    "@types/node": "^20.11.0",
     "dat.gui": "^0.7.9",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "vite": "5.0.2"
   },
   "dependencies": {
-    "polyfill-crypto.getrandomvalues": "^1.0.0",
     "aucore": "link:../../aucore/pkg",
-    "shared_types": "link:../../shared_types/generated/typescript"
+    "polyfill-crypto.getrandomvalues": "^1.0.0",
+    "typegen": "link:../../typegen/generated/typescript"
   }
 }

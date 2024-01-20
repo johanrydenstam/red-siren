@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import UIKit
-import SharedTypes
+import CoreTypes
 import Serde
 import OSLog
 
@@ -11,8 +11,10 @@ class Core: ObservableObject {
 
     @State var playback: Playback = Playback()
     
+    @State var defaults: UserDefaults = UserDefaults()
+    
     var startClock: ((
-        @escaping(Double) -> Void
+        @escaping(Double?) -> Void
     ) -> Void)?
     
     var stopClock: (() -> Void)?
@@ -38,8 +40,18 @@ class Core: ObservableObject {
         case let .navigate(.to(activity)):
             self.update(Event.reflectActivity(activity))
             break
-        case .keyValue(.read):
-            let response = KeyValueOutput.read(.none)
+        case .keyValue(.read(let key)):
+            
+            var response = KeyValueOutput.read(.none)
+            
+            if let data = self.defaults.array(forKey: key) {
+                response = KeyValueOutput.read(.some(data as! [UInt8]))
+                Logger().log("restore data for \(key)")
+            }
+            else {
+                Logger().log("no data for \(key)")
+            }
+            
 
             let effects = [UInt8](handleResponse(Data(request.uuid), Data(try! response.bincodeSerialize())))
 
@@ -47,8 +59,10 @@ class Core: ObservableObject {
             for request in requests {
                 processEffect(request)
             }
-        case .keyValue(.write):
-            let response = KeyValueOutput.write(false)
+        case .keyValue(.write(let key, let data)):
+            self.defaults.setValue(data, forKey: key)
+            
+            let response = KeyValueOutput.write(true)
 
             let effects = [UInt8](handleResponse(Data(request.uuid), Data(try! response.bincodeSerialize())))
 
@@ -57,42 +71,36 @@ class Core: ObservableObject {
                 processEffect(request)
             }
         case .play(let op):
-            Task {
-                let response = await playback.request(op)
-
-
-                let effects = [UInt8](handleResponse(Data(request.uuid), Data(response)))
-
-                let requests: [Request] = try! .bincodeDeserialize(input: effects)
-                for request in requests {
-                    processEffect(request)
-                }
-            }
-            break
-        case .animate(.start):
-            Task {
-                self.startClock!({ ts in
-                    let data = try! AnimateOperationOutput.timestamp(ts).bincodeSerialize()
-                    let effects = [UInt8](handleResponse(Data(request.uuid), Data(data)))
+            playback.request(op) { response in
+                DispatchQueue.main.async {
+                    let effects = [UInt8](handleResponse(Data(request.uuid), Data(response)))
 
                     let requests: [Request] = try! .bincodeDeserialize(input: effects)
                     for request in requests {
                         self.processEffect(request)
                     }
-                })
+                }
             }
             break
-        case .animate(.stop):
-            Task {
-                self.stopClock!()
-                let data = try! AnimateOperationOutput.done.bincodeSerialize()
+        case .animate(.start):
+            self.startClock!({ ts in
+                var data = try! AnimateOperationOutput.done.bincodeSerialize()
+                if let ts = ts {
+                    data = try! AnimateOperationOutput.timestamp(ts).bincodeSerialize()
+                }
+                else {
+                    Logger().log("tick is none, animation is done")
+                }
                 let effects = [UInt8](handleResponse(Data(request.uuid), Data(data)))
 
                 let requests: [Request] = try! .bincodeDeserialize(input: effects)
                 for request in requests {
                     self.processEffect(request)
                 }
-            }
+            })
+            break
+        case .animate(.stop):
+            self.stopClock!()
             break
         }
 

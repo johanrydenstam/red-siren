@@ -8,8 +8,6 @@ export class RedSirenNode extends AudioWorkletNode {
   private initPromiseResolve: (() => void) | null = null;
   private initPromiseReject: ((reason: any) => void) | null = null;
 
-
-
   constructor(ctx: AudioContext) {
     super(ctx, "red-siren");
   }
@@ -19,18 +17,17 @@ export class RedSirenNode extends AudioWorkletNode {
       try {
         const response = await window.fetch(RedSirenNode.wasmUrl);
         const wasmBytes = await response.arrayBuffer();
-  
+
         this.port.onmessage = this.onmessage.bind(this);
-  
+
         this.port.postMessage({
           type: "send-wasm-module",
           wasmBytes,
         });
         this.initPromiseResolve = resolve;
         this.initPromiseReject = reject;
-      }
-      catch (e) {
-        reject(e)
+      } catch (e) {
+        reject(e);
       }
     });
   }
@@ -43,7 +40,13 @@ export class RedSirenNode extends AudioWorkletNode {
     }
   }
 
-  onResolve = (out: Uint8Array, id?: string) => {};
+  onResolve = (out: Uint8Array): void => {
+    throw new Error("no resolver");
+  };
+
+  onCapture = (out: Uint8Array): void => {
+    throw new Error("no capture");
+  };
 
   onprocessorerror = (err: Event) => {
     console.error(`An error from AudioWorkletProcessor: ${err}`);
@@ -60,9 +63,10 @@ export class RedSirenNode extends AudioWorkletNode {
       this.initPromiseResolve && this.initPromiseResolve();
     } else if (msg.data.type === "error") {
       this.onprocessorerror(msg.data.error);
-    }
-    else if (msg.data.type === "red-siren-resolve") {
-      this.onResolve(msg.data.output, msg.data.id)
+    } else if (msg.data.type === "red-siren-resolve") {
+      this.onResolve(msg.data.output);
+    } else if (msg.data.type === "red-siren-capture") {
+      this.onCapture(msg.data.output);
     }
   };
 
@@ -73,13 +77,9 @@ export class RedSirenNode extends AudioWorkletNode {
     });
   }
   
-  public forwardWithId(ev: Uint8Array, id: string) {
+  public clearBuffer() {
     this.port.postMessage({
-      type: "red-siren-ev-id",
-      ev,
-      id
+      type: "clear-buffer",
     });
   }
 }
-
-

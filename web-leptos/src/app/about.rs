@@ -1,8 +1,8 @@
 use leptos::*;
 use leptos_meta::Title;
 
-use shared::instrument::layout::MenuPosition;
-use shared::{intro, Activity, Event};
+use app_core::instrument::layout::MenuPosition;
+use app_core::{intro, Activity, Event};
 
 use super::intro::SplashPicture;
 
@@ -48,7 +48,7 @@ pub fn AboutContent(#[prop(into)] position: Signal<MenuPosition>) -> impl IntoVi
     view! {
       <div class={about_class} style={about_style}>
         <Title text="Red Siren - About"/>
-        <h2 class="text-4xl my-auto text-center italic">{"About the Red Siren"}</h2>
+        <h2 class="text-4xl my-auto text-center italic">{"About the Red Siren β"}</h2>
         <p class="text-center">{"Red Siren is a noise chime."}</p>
         <dl>
             <dt>{"Red"}</dt>
@@ -64,10 +64,6 @@ pub fn AboutContent(#[prop(into)] position: Signal<MenuPosition>) -> impl IntoVi
             <dt>{"chime"}</dt>
                 <dd>{"The musical instrument."}</dd>
         </dl>
-
-        <p>{r#"
-            
-        "#}</p>
 
         <button class=btn_class on:click=move|_| exit_ev(())>
             {"Clear"}

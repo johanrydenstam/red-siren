@@ -8,19 +8,19 @@ use leptos_use::{
     UseTimestampReturn,
 };
 
-use shared::{Activity, Event};
 
 use crate::{
     error_template::{AppError, ErrorTemplate},
     util::use_dpi,
 };
 
-mod core;
+mod about;
+mod core_bindings;
 mod instrument;
 mod intro;
+mod red_card;
 mod menu;
-
-mod about;
+mod tuner;
 
 cfg_if! { if #[cfg(feature="browser")]{
     mod playback;
@@ -33,6 +33,10 @@ cfg_if! { if #[cfg(feature="browser")]{
         impl Playback {
             pub fn new() -> Self {
                 Self
+            }
+
+            pub fn on_capture(&self, _: leptos::WriteSignal<app_core::Event>){
+                unimplemented!()
             }
         }
     }
@@ -73,7 +77,7 @@ pub fn RootComponent() -> impl IntoView {
         <Meta name="msapplication-square150x150logo" content="/favicon/mstile-150x150.png" />
         <Meta name="msapplication-wide310x150logo" content="/favicon/mstile-310x150.png" />
         <Meta name="msapplication-square310x310logo" content="/favicon/mstile-310x310.png" />
-        <Meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <Meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <Style>
             {"@import url('https://fonts.googleapis.com/css2?family=Rosarivo:ital@0;1&display=swap');"}
         </Style>
@@ -95,11 +99,16 @@ pub fn RootComponent() -> impl IntoView {
 
 #[component]
 fn RedSirenCore() -> impl IntoView {
-    let core = core::new();
+    let core = core_bindings::new();
     let view_rw_signal = create_rw_signal(core.view());
     let render = view_rw_signal.write_only();
     let playback = use_context::<ReadSignal<playback::Playback>>().unwrap();
-    let (event, set_event) = create_signal(Event::Start);
+    let (event, set_event) = create_signal(app_core::Event::Start);
+
+    create_effect(move|_| {
+        let pb = playback();
+        pb.on_capture(set_event);
+    });
 
     let navigate = leptos_router::use_navigate();
     let navigate_cb = Callback::new(move |path| navigate(path, Default::default()));
@@ -136,7 +145,7 @@ fn RedSirenCore() -> impl IntoView {
     });
 
     create_effect(move |_| {
-        core::update(
+        core_bindings::update(
             &core,
             event.get(),
             render,
@@ -152,11 +161,11 @@ fn RedSirenCore() -> impl IntoView {
         let pathname = (location.pathname)();
         log::debug!("browser or user activated pathname: {pathname}");
         match pathname.as_str() {
-            "/tune" => set_event(Event::ReflectActivity(Activity::Tune)),
-            "/play" => set_event(Event::ReflectActivity(Activity::Play)),
-            "/listen" => set_event(Event::ReflectActivity(Activity::Listen)),
-            "/about" => set_event(Event::ReflectActivity(Activity::About)),
-            _ => set_event(Event::ReflectActivity(Activity::Intro)),
+            "/tune" => set_event(app_core::Event::ReflectActivity(app_core::Activity::Tune)),
+            "/play" => set_event(app_core::Event::ReflectActivity(app_core::Activity::Play)),
+            "/listen" => set_event(app_core::Event::ReflectActivity(app_core::Activity::Listen)),
+            "/about" => set_event(app_core::Event::ReflectActivity(app_core::Activity::About)),
+            _ => set_event(app_core::Event::ReflectActivity(app_core::Activity::Intro)),
         }
     });
 
@@ -179,7 +188,7 @@ fn RedSirenCore() -> impl IntoView {
         let (width, height) = size.get();
         let dpi = dpi.get() as f64;
 
-        set_event(Event::CreateConfigAndConfigureApp {
+        set_event(app_core::Event::CreateConfigAndConfigureApp {
             width: width as f64,
             height: height as f64,
             dpi,
@@ -188,9 +197,22 @@ fn RedSirenCore() -> impl IntoView {
     });
 
     let intro_vm = create_read_slice(view_rw_signal, move |v| v.intro.clone());
-    let intro_ev = SignalSetter::map(move |ev| set_event.set(Event::IntroEvent(ev)));
+    let intro_ev = SignalSetter::map(move |ev| set_event.set(app_core::Event::IntroEvent(ev)));
     let instrument_vm = create_read_slice(view_rw_signal, move |v| v.instrument.clone());
-    let instrument_ev = SignalSetter::map(move |ev| set_event.set(Event::InstrumentEvent(ev)));
+    let instrument_ev = SignalSetter::map(move |ev| set_event.set(app_core::Event::InstrumentEvent(ev)));
+    let tuner_vm = create_read_slice(view_rw_signal, move |v| v.tuner.clone());
+    let tuner_ev = SignalSetter::map(move |ev| set_event.set(app_core::Event::TunerEvent(ev)));
+
+    let view_box = Signal::derive(move || {
+        let vb = view_rw_signal.get().view_box;
+        format!(
+            "{} {} {} {}",
+            vb.top_left().x,
+            vb.top_left().y,
+            vb.bottom_right().x,
+            vb.bottom_right().y
+        )
+    });
 
     provide_context(set_event);
 
@@ -209,8 +231,16 @@ fn RedSirenCore() -> impl IntoView {
             } />
             <Route path="play" view=move || view! {
                 <instrument::InstrumentComponent
+                    view_box=view_box
                     vm=instrument_vm
                     ev=instrument_ev
+                />
+            } />
+            <Route path="tune" view=move || view! {
+                <tuner::TunerComponent
+                    view_box=view_box
+                    vm=tuner_vm
+                    ev=tuner_ev
                 />
             } />
         </Routes>

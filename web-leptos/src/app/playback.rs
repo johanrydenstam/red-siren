@@ -1,28 +1,53 @@
 use std::{cell::RefCell, rc::Rc};
 
+use app_core::{play, Event};
 use js_sys::{Promise, Uint8Array};
-use leptos::*;
-use shared::play;
+use leptos::{WriteSignal, SignalSet, request_animation_frame};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
 #[derive(Clone)]
-pub struct Playback(Rc<RefCell<PlaybackJs>>);
+pub struct Playback(
+    Rc<RefCell<PlaybackBridgeJs>>,
+    Rc<RefCell<Closure<dyn FnMut(JsValue)>>>,
+);
 
 impl Playback {
     pub fn new() -> Self {
-        Self(Rc::new(RefCell::new(PlaybackJs::new())))
+        Self(
+            Rc::new(RefCell::new(PlaybackBridgeJs::new())),
+            Rc::new(RefCell::new(Closure::wrap(Box::new(move |_: JsValue| {
+                unimplemented!("no capture callback registered")
+            })
+                as Box<dyn FnMut(JsValue)>))),
+        )
     }
 
-    pub async fn request(&self, op: play::PlayOperation) -> play::PlayOperationOutput {
+    pub async fn request(&mut self, op: play::PlayOperation) -> play::PlayOperationOutput {
         log::trace!("playback request {op:?}");
+
         let data = Self::js_value_forwarded_event(op);
+
         let promise = self.0.borrow().request(&data);
 
         JsFuture::from(promise)
             .await
-            .map(|op| Self::from_forwarded_effect(op))
+            .map(|op| Self::play_op_from_forwarded_effect(op))
             .expect("bridging error")
+    }
+
+    pub fn on_capture(&self, set_ev: WriteSignal<Event>) {
+        let cb = Closure::wrap(Box::new(move |d: JsValue| {
+            let capture = Self::capture_from_forwarded_effect(d);
+            request_animation_frame(move|| {
+                set_ev.set(Event::Capture(capture));
+            })
+        }) as Box<dyn FnMut(JsValue)>);
+        *self.1.borrow_mut() = cb;
+
+        self.0
+            .borrow()
+            .set_on_capture(self.1.borrow().as_ref().unchecked_ref())
     }
 
     fn js_value_forwarded_event(event: play::PlayOperation) -> JsValue {
@@ -31,13 +56,26 @@ impl Playback {
         data.into()
     }
 
-    fn from_forwarded_effect(result: JsValue) -> play::PlayOperationOutput {
-        log::trace!("playback result {result:?}");
+    fn play_op_from_forwarded_effect(result: JsValue) -> play::PlayOperationOutput {
         let data = Uint8Array::from(result);
         let mut dst = (0..data.length()).map(|_| 0 as u8).collect::<Vec<_>>();
         data.copy_to(dst.as_mut_slice());
-        bincode::deserialize::<play::PlayOperationOutput>(dst.as_slice())
-            .expect("effect deserialization err")
+        let result = bincode::deserialize::<play::PlayOperationOutput>(dst.as_slice()).expect("effect deserialization err");
+
+        // log::trace!("playback result {result:?}");
+
+        result
+    }
+    
+    fn capture_from_forwarded_effect(result: JsValue) -> play::CaptureOutput {
+        let data = Uint8Array::from(result);
+        let mut dst = (0..data.length()).map(|_| 0 as u8).collect::<Vec<_>>();
+        data.copy_to(dst.as_mut_slice());
+        let result = bincode::deserialize::<play::CaptureOutput>(dst.as_slice()).expect("effect deserialization err");
+
+        // log::trace!("playback result {result:?}");
+
+        result
     }
 }
 
@@ -46,17 +84,14 @@ extern "C" {
 
     #[derive(Clone)]
     #[wasm_bindgen(js_name = PlaybackBridge)]
-    pub type PlaybackJs;
+    pub type PlaybackBridgeJs;
 
     #[wasm_bindgen(constructor, js_class = "PlaybackBridge")]
-    pub fn new() -> PlaybackJs;
+    pub fn new() -> PlaybackBridgeJs;
 
     #[wasm_bindgen(method, js_class = "PlaybackBridge")]
-    pub fn request(this: &PlaybackJs, req: &JsValue) -> Promise;
+    pub fn request(this: &PlaybackBridgeJs, req: &JsValue) -> Promise;
 
-    #[wasm_bindgen(structural, method, getter, js_name = callHost, js_class = "PlaybackBridge")]
-    pub fn call_host_block(this: &PlaybackJs) -> Option<::js_sys::Function>;
-
-    #[wasm_bindgen(structural, method, setter, js_name = callHost, js_class = "PlaybackBridge")]
-    pub fn set_call_host_block(this: &PlaybackJs, val: Option<&::js_sys::Function>);
+    #[wasm_bindgen(method, structural, setter, js_class = "PlaybackBridge")]
+    pub fn set_on_capture(this: &PlaybackBridgeJs, val: &js_sys::Function);
 }
