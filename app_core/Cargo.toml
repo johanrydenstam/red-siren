@@ -37,7 +37,7 @@ keyframe = "1.1.1"
 keyframe_derive = "1.0.0"
 mint = { workspace = true, features = ["serde"] }
 num-integer = "0.1.45"
-hecs = { version = "0.10.3", features = ["serde", "macros"] }
+hecs = { version = "0.10.4", features = ["serde", "macros"] }
 futures = "0.3.29"
 uuid = { version = "1.6.1", features = ["v4"] }
 # platforms

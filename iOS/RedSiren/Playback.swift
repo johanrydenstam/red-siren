@@ -25,14 +25,18 @@ class Playback: NSObject, ObservableObject {
         case .permissions:
             Task {
                 let grant = await isAuthorized
-                let data = try! [UInt8](PlayOperationOutput.permission(grant).bincodeSerialize())
-                onData(Data(data))
-                
+                if grant {
+                    let data = try! [UInt8](PlayOperationOutput.success.bincodeSerialize())
+                    onData(Data(data))
+                } else {
+                    let data = try! [UInt8](PlayOperationOutput.failure.bincodeSerialize())
+                    onData(Data(data))
+                    }
                 Logger().log("playback permissions task complete")
             }
         case .installAU:
             guard setupAudioSession() else {
-                let data = try! PlayOperationOutput.success(false).bincodeSerialize()
+                let data = try! PlayOperationOutput.success.bincodeSerialize()
 
                 onData(Data(data))
                 
@@ -52,7 +56,7 @@ class Playback: NSObject, ObservableObject {
                 }
             }
             catch {
-                let data = try! [UInt8](PlayOperationOutput.success(false).bincodeSerialize())
+                let data = try! [UInt8](PlayOperationOutput.failure.bincodeSerialize())
                 onData(Data(data))
             }
         default:
@@ -69,7 +73,7 @@ class Playback: NSObject, ObservableObject {
                 }
             }
             catch {
-                let data = try! [UInt8](PlayOperationOutput.success(false).bincodeSerialize())
+                let data = try! [UInt8](PlayOperationOutput.failure.bincodeSerialize())
                 onData(Data(data))
             }
 

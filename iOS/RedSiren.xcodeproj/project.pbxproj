@@ -555,8 +555,8 @@
 				CARGO_BUILD_TYPE = release;
 				CODE_SIGN_ENTITLEMENTS = RedSiren/RedSiren.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = M59X77GZ2V;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = RedSiren/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Red Siren";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -573,7 +573,7 @@
 					"-ObjC",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.anvlkv.redsiren.RedSiren;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jr.RedSiren;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = generated/ffirsFFI.h;
@@ -592,8 +592,8 @@
 				CARGO_BUILD_TYPE = debug;
 				CODE_SIGN_ENTITLEMENTS = RedSiren/RedSiren.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = M59X77GZ2V;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = RedSiren/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Red Siren";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -609,7 +609,7 @@
 					"-ObjC",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.anvlkv.redsiren.RedSiren;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jr.RedSiren;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = generated/ffirsFFI.h;

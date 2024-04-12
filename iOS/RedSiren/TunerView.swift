@@ -8,9 +8,9 @@ struct TunerFFTView: View {
     var center: (CGFloat, CGFloat)
     var p0: CGPoint
     var p1: CGPoint
-    var data: [[Float]]
+    var data: [[Double]]
 
-    init(line: Line, data: [[Float]]) {
+    init(line: Line, data: [[Double]]) {
         self.layoutLine = line
         let hSize = self.layoutLine.line[1][0] - self.layoutLine.line[0][0]
         let vSize = self.layoutLine.line[1][1] - self.layoutLine.line[0][1]
